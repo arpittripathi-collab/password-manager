@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <?php
 include 'db/db.php';
 session_start();

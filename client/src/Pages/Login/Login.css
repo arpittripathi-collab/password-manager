@@ -1,0 +1,191 @@
+html, body {
+  height: 100%;
+  margin-bottom: 10%;
+  overflow: hidden; /* Disable scrolling */
+  background-color: #0f293e;
+  color: #ffffff;
+}
+
+.login {
+  width: 100%;
+  height: 91vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Poppins", sans-serif;
+  position: relative;
+  background-image: url("../../assets/images/login.jpg"); /* Path to your image */
+  background-size: cover;
+  background-position: center;
+  filter: brightness(1); /* Darken the background image for better text visibility */
+}
+
+.login__wrapper {
+  display: flex;
+  flex-direction: row-reverse;
+  border-radius: 20px;
+  overflow: hidden;
+  max-width: 920px;
+  width: 100%;
+  box-shadow: 0 0 30px rgba(0, 230, 118, 0.25), 0 8px 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  height: auto;
+  margin: auto 0; /* Center vertically if needed */
+}
+
+/* Left Side */
+.login_left {
+  flex: 37%;
+  height: 70vh;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  backdrop-filter: blur(10px); /* Blurring effect on left side */
+  border-top-left-radius: 0.5rem;
+  border-bottom-left-radius: 0.5rem;
+  background: linear-gradient(to bottom right, rgba(0, 0, 0, 0.4), rgba(30, 30, 30, 0.4));
+  box-shadow: inset 0 0 15px rgba(0, 230, 118, 0.15);
+}
+
+.inputs {
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  color: #ffffff;
+}
+
+.inputs input {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border: 2px solid transparent; /* Set border to transparent */
+  outline: none;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.3); /* Darker background for inputs */
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.5); /* Initial glowing border effect */
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.inputs input:focus {
+  box-shadow: 0 0 10px rgba(0, 255, 255, 1), 0 0 5px rgba(0, 255, 255, 0.7); /* Glowing effect on focus */
+  border: 2px solid #00ffff; /* Glowing border on focus */
+}
+
+.inputs label {
+  margin-top: 1rem;
+  color: #eeeeee;
+}
+
+.login_left button {
+  padding: 0.8rem 1.5rem;
+  border: 2px solid transparent; /* Set border to transparent */
+  outline: none;
+  background-color: #00e676;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 1.5rem;
+  border-radius: 5px;
+  box-shadow: 0 0 10px #00e67688;
+  color: black;
+  font-weight: bold;
+  transition: box-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
+}
+
+.login_left button:hover {
+   background-color: #00c853;
+  box-shadow: 0 0 15px #00c853cc;
+}
+
+.login_left p,
+.login_left p a {
+  font-size: 0.9rem;
+  margin-top: 1rem;
+
+
+}
+.login_left  a{
+  text-decoration: none;
+  color: #0af034;
+}
+.login_left  a:hover{
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 14px;
+}
+
+/* Right Side - Adjusting for Text Only with Light Blur */
+.login_right {
+  flex: 60%;
+ 
+  position: relative;
+  overflow: hidden;
+  border-top-right-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  backdrop-filter: blur(4px); /* Light blur effect */
+  background: rgba(0, 0, 0, 0.2); /* Subtle dark background to keep the text visible */
+  box-shadow: inset 0 0 15px rgba(111, 0, 230, 0.15); /* Light shadow */
+}
+
+
+
+.login__content {
+  z-index: 3;
+  color: #eeeeee;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.8); /* Glowing text effect */
+}
+
+.login__content h1 {
+  font-size: 4rem;
+  font-weight: bold;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.9); /* Stronger glow on title */
+}
+
+.login__content h4 {
+  font-weight: normal;
+  margin-top: 0.5rem;
+}
+
+.login__content p {
+  font-size: 1.2rem;
+  margin-top: 1rem;
+}
+
+.login__content a:nth-child(1) {
+  color: #0cf30c;
+  border-bottom: 2px solid #ff4476a8;
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.8); /* Glowing effect for links */
+}
+
+.attr {
+  color: #fdfdfda1;
+  font-size: 0.6rem;
+  margin-top: 2rem;
+}
+
+/* Media Query for smaller screens */
+@media (max-width: 900px) {
+  .login__wrapper {
+    flex-direction: column;
+    height: auto;
+    margin: 2rem 0;
+  }
+
+  .login_left, .login_right {
+    width: 100%;
+    padding: 2rem;
+    border-right: none;
+  }
+
+  .login_right {
+    order: -1;
+  }
+}

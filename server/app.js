@@ -23,8 +23,9 @@ app.use(express.json());
 // LINKING THE ROUTER FILES 
 app.use(require("./router/routing"));
 
-
-
+app.get('/', (req, res) => {
+  res.send('Server is responding!');
+});
 
 
 // LISTENING TO PORT 

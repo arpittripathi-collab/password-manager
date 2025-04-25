@@ -1,7 +1,6 @@
 import axios from "axios";
-const isDev = true;
 
-const url = isDev ? "https://password-manager-rsi7.onrender.com" : "";
+const url = process.env.REACT_APP_API_URL;
 
 const instance = axios.create({
     baseURL: url,

@@ -2,7 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const authenticate = require('./middleware/authenticate'); // import middleware
+const authenticate = require('./middlewares/authenticate'); // import middleware
 
 const app = express();
 

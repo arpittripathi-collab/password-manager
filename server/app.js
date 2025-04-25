@@ -6,7 +6,11 @@ const cookieParser = require('cookie-parser');
 
 
 
-app.use(cors({credentials: true, origin: 'https://password-manager-six-lemon.vercel.app'}));
+app.use(cors({
+    origin: ["https://password-manager-six-lemon.vercel.app"],
+    method: ["POST","GET"],
+    credentials: true
+}));
 app.use(cookieParser());   
 
 // SETTING UP DOTENV

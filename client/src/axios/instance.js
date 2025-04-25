@@ -12,7 +12,7 @@ const instance = axios.create({
   withCredentials: true  // This ensures cookies are sent with each request
 });
 
-export const checkAuthenticated = () => instance.get("/authenticate");
+export const checkAuthenticated = () => instance.post("/authenticate");
 export const loginUser = (data) => instance.post("/login", data);
 export const logoutUser = () => instance.get("/logout");
 export const signupUser = (data) => instance.post("/register", data);

@@ -6,13 +6,13 @@ const cookieParser = require('cookie-parser');
 
 
 
-app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+app.use(cors({credentials: true, origin: 'https://password-manager-six-lemon.vercel.app/'}));
 app.use(cookieParser());   
 
 // SETTING UP DOTENV
 dotenv.config({ path: "./config.env" });
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT;
 
 // CONNECTING WITH DATABASE
 require("./db/connection");

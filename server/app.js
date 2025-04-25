@@ -7,7 +7,7 @@ const cookieParser = require('cookie-parser');
 
 
 app.use(cors({
-    origin: ["https://password-manager-six-lemon.vercel.app"],
+    origin: ["https://password-manager-eight-xi.vercel.app"],
     method: ["POST","GET"],
     credentials: true
 }));

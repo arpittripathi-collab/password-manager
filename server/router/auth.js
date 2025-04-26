@@ -1,38 +1,51 @@
+// server/router/auth.js
+require('dotenv').config();         // ensure env-vars are available here too
 const express = require('express');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const User = require("../models/schema");
-const router = express.Router();
+const bcrypt  = require('bcrypt');
+const User    = require('../models/schema');
+const router  = express.Router();
 
-router.post("/login", async (req, res) => {
+router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
+  // 1) Validate input
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required.' });
+  }
+
   try {
-    // Check if user exists
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: "Invalid email" });
+    // 2) Check if user exists
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid email or password.' });
+    }
 
-    // Validate password
+    // 3) Validate password
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ error: "Invalid password" });
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Invalid email or password.' });
+    }
 
-    // Generate token
-    const token = jwt.sign({ _id: user._id }, process.env.SECRET_KEY, { expiresIn: "1d" });
+    // 4) Generate & save token via schema method
+    const token = await user.generateAuthToken();
 
-    // Set token in cookie
+    // 5) Set cookie for client
     res.cookie('jwtoken', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",  // Enable only on HTTPS
-      sameSite: 'None',  // Required for cross-origin requests
-      maxAge: 24 * 60 * 60 * 1000  // Token valid for 1 day
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'None',
+      maxAge: 24 * 60 * 60 * 1000
     });
 
-    // Send response
-    res.json({ message: "Login successful", user: { email: user.email } });
+    // 6) Send minimal user info (omit password & tokens)
+    res.json({
+      message: 'Login successful',
+      user: { email: user.email, name: user.name }
+    });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error('Login Error:', err);
+    res.status(500).json({ error: 'Server error. Please try again later.' });
   }
 });
 

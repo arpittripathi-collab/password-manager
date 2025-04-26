@@ -1,33 +1,47 @@
+// middlewares/authenticate.js
+
 const jwt = require('jsonwebtoken');
-const User = require("../models/schema");
+const User = require('../models/schema');
 
 const authenticate = async (req, res, next) => {
   try {
-    const token = req.cookies.jwtoken;
+    // 1) Try cookie first:
+    let token = req.cookies?.jwtoken;
 
-    // No token provided
+    // 2) Fallback to Authorization header:
     if (!token) {
-      return res.status(401).json({ error: "No token provided" });
+      const authHeader = req.headers.authorization || '';
+      if (authHeader.startsWith('Bearer ')) {
+        token = authHeader.slice(7).trim();
+      }
     }
 
-    // Verify token
-    const verify = jwt.verify(token, process.env.SECRET_KEY);
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
 
-    // Check if the user exists and token matches
-    const rootUser = await User.findOne({ _id: verify._id, "tokens.token": token });
+    // 3) Verify signature & extract payload
+    const payload = jwt.verify(token, process.env.SECRET_KEY);
+
+    // 4) Lookup user + token in DB
+    const rootUser = await User.findOne({
+      _id: payload._id,
+      'tokens.token': token
+    });
+
     if (!rootUser) {
-      throw new Error("User not found");
+      return res.status(401).json({ error: 'User not found' });
     }
 
-    // Add user info to request object
+    // 5) Attach to req and proceed
     req.token = token;
     req.rootUser = rootUser;
     req.userId = rootUser._id;
+    next();
 
-    next(); // Allow the request to proceed
-  } catch (error) {
-    console.error("Auth Error:", error.message);
-    res.status(401).json({ error: "Unauthorized user." });
+  } catch (err) {
+    console.error('Auth Error:', err.message);
+    return res.status(401).json({ error: 'Unauthorized user.' });
   }
 };
 

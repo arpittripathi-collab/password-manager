@@ -1,147 +1,130 @@
-const express = require("express");
-const router = express.Router();
-const User = require("../models/schema");
-const bcrypt = require("bcrypt");
-const authenticate = require("../middlewares/authenticate");
-const { encrypt, decrypt } = require("../models/EncDecManager");
+// server/router/routing.js
+require('dotenv').config();
+const express      = require('express');
+const router       = express.Router();
+const User         = require('../models/schema');
+const authenticate = require('../middlewares/authenticate');
 
-// Register Route
-router.post("/register", async (req, res) => {
-    const { name, email, password, cpassword } = req.body;
+// — REGISTER —  
+router.post('/register', async (req, res) => {
+  const { name, email, password, cpassword } = req.body;
+  if (!name || !email || !password || !cpassword) {
+    return res.status(400).json({ error: 'All fields are required.' });
+  }
+  if (password !== cpassword) {
+    return res.status(400).json({ error: 'Passwords do not match.' });
+  }
 
-    if (!name || !email || !password || !cpassword) {
-        return res.status(400).json({ error: "Invalid Credentials" });
-    } else {
-        if (password === cpassword) {
-            try {
-                const result = await User.findOne({ email: email });
-
-                if (result) {
-                    return res.status(400).json({ error: "Email already exists." });
-                }
-
-                // Hash the password before saving
-                const hashedPassword = await bcrypt.hash(password, 12);
-
-                const newUser = new User({ name, email, password: hashedPassword });
-
-                await newUser.save();
-
-                return res.status(201).json({ message: "User created successfully." });
-            } catch (error) {
-                console.log(error);
-                return res.status(500).json({ error: "An error occurred during registration." });
-            }
-        } else {
-            return res.status(400).json({ error: "Passwords do not match." });
-        }
+  try {
+    // normalize email
+    const normalizedEmail = email.toLowerCase().trim();
+    if (await User.exists({ email: normalizedEmail })) {
+      return res.status(400).json({ error: 'Email already registered.' });
     }
+
+    // schema pre-save will hash for us
+    const newUser = new User({ name: name.trim(), email: normalizedEmail, password });
+    await newUser.save();
+    return res.status(201).json({ message: 'User created successfully.' });
+
+  } catch (err) {
+    console.error('Registration Error:', err);
+    return res.status(500).json({ error: 'Server error during registration.' });
+  }
 });
 
-// Login Route
-router.post("/login", async (req, res) => {
-    const { email, password } = req.body;
+// — LOGIN —  
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required.' });
+  }
 
-    if (!email || !password) {
-        return res.status(400).json({ error: "Please fill the data." });
+  try {
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!user || !(await user.comparePassword(password))) {
+      return res.status(400).json({ error: 'Invalid email or password.' });
     }
 
-    try {
-        const emailExist = await User.findOne({ email: email });
+    // generateAuthToken saves to user.tokens
+    const token = await user.generateAuthToken();
+    res.cookie('jwtoken', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'None',
+      maxAge: 24 * 60 * 60 * 1000
+    });
 
-        if (!emailExist) {
-            return res.status(400).json({ error: "Invalid Credentials." });
-        }
+    return res.json({ message: 'Login successful.' });
 
-        const isMatch = await bcrypt.compare(password, emailExist.password);
-
-        if (isMatch) {
-            const token = await emailExist.generateAuthToken();
-
-            res.cookie("jwtoken", token, {
-                expires: new Date(Date.now() + 2592000000), // 30 days
-                httpOnly: true,
-            });
-
-            return res.status(200).json({ message: "User logged in successfully." });
-        } else {
-            return res.status(400).json({ error: "Invalid Credentials" });
-        }
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ error: "An error occurred during login." });
-    }
+  } catch (err) {
+    console.error('Login Error:', err);
+    return res.status(500).json({ error: 'Server error during login.' });
+  }
 });
 
-// Authenticate Route
-router.get("/authenticate", authenticate, async (req, res) => {
-    res.send(req.rootUser);
+// — GET CURRENT USER —  
+router.get('/authenticate', authenticate, (req, res) => {
+  const { _id, name, email, vault } = req.rootUser;
+  res.json({ id: _id, name, email, vault: req.rootUser.getVault() });
 });
 
-// Add New Password Route
-router.post("/addnewpassword", authenticate, async (req, res) => {
-    const { platform, userPass, userEmail, platEmail } = req.body;
-
-    if (!platform || !userPass || !userEmail || !platEmail) {
-        return res.status(400).json({ error: "Please fill the form properly" });
-    }
-
-    try {
-        const rootUser = req.rootUser;
-
-        const { iv, encryptedPassword } = encrypt(userPass);
-
-        const isSaved = await rootUser.addNewPassword(encryptedPassword, iv, platform, platEmail);
-
-        if (isSaved) {
-            return res.status(200).json({ message: "Successfully added your password." });
-        } else {
-            return res.status(400).json({ error: "Could not save the password." });
-        }
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ error: "An error occurred while saving the password." });
-    }
+// — ADD A NEW CREDENTIAL —  
+router.post('/vault', authenticate, async (req, res) => {
+  const { platform, platEmail, password } = req.body;
+  if (!platform || !platEmail || !password) {
+    return res.status(400).json({ error: 'platform, platEmail & password are required.' });
+  }
+  try {
+    await req.rootUser.addNewPassword(password, platform, platEmail);
+    return res.status(201).json({ message: 'Credential added.' });
+  } catch (err) {
+    console.error('Add Credential Error:', err);
+    return res.status(500).json({ error: 'Server error adding credential.' });
+  }
 });
 
-// Delete Password Route
-router.post("/deletepassword", authenticate, async (req, res) => {
-    const { id } = req.body;
-
-    if (!id) {
-        return res.status(400).json({ error: "Could not find data" });
+// — DELETE A CREDENTIAL —  
+router.delete('/vault/:id', authenticate, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await User.updateOne(
+      { _id: req.userId },
+      { $pull: { vault: { _id: id } } }
+    );
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ error: 'Credential not found.' });
     }
-
-    try {
-        const rootUser = req.rootUser;
-
-        const isDeleted = await User.updateOne(
-            { email: rootUser.email },
-            { $pull: { passwords: { _id: id } } }
-        );
-
-        if (!isDeleted) {
-            return res.status(400).json({ error: "Could not delete the password." });
-        }
-
-        return res.status(200).json({ message: "Successfully deleted your password." });
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ error: "An error occurred while deleting the password." });
-    }
+    return res.json({ message: 'Credential deleted.' });
+  } catch (err) {
+    console.error('Delete Credential Error:', err);
+    return res.status(500).json({ error: 'Server error deleting credential.' });
+  }
 });
 
-// Logout Route
-router.get("/logout", (req, res) => {
-    res.clearCookie("jwtoken", { path: "/" });
-    res.status(200).send("Logged out successfully.");
+// — LOGOUT —  
+router.post('/logout', authenticate, (req, res) => {
+  res.clearCookie('jwtoken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'None'
+  });
+  res.json({ message: 'Logout successful.' });
 });
 
-// Decrypt Password Route
-router.post("/decrypt", (req, res) => {
-    const { iv, encryptedPassword } = req.body;
-
-    return res.status(200).send(decrypt(encryptedPassword, iv));
+// — DECRYPT (protected) —  
+router.post('/decrypt', authenticate, (req, res) => {
+  const { iv, encryptedPassword } = req.body;
+  if (!iv || !encryptedPassword) {
+    return res.status(400).json({ error: 'iv & encryptedPassword required.' });
+  }
+  try {
+    const plain = decrypt(encryptedPassword, iv);
+    return res.json({ password: plain });
+  } catch (err) {
+    console.error('Decrypt Error:', err);
+    return res.status(500).json({ error: 'Server error during decryption.' });
+  }
 });
 
 module.exports = router;

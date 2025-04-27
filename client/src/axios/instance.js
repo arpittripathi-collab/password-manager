@@ -1,6 +1,10 @@
 import axios from "axios";
 const isDev = true;
 
+const getToken = () => {
+  return document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1] || ''; 
+ 
+};
 const url = isDev ? "https://password-manager-rsi7.onrender.com" : "";
 
 const instance = axios.create({

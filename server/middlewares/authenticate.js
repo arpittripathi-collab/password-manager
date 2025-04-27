@@ -5,9 +5,9 @@ const authenticate = async (req, res, next) => {
     try {
         const token = req.cookies.jwtoken;
 
-        if (!token) {
-            return res.status(401).json({ error: "No token provided" });
-        }
+        // if (!token) {
+        //     return res.status(401).json({ error: "No token provided" });
+        // }
 
         const verify = jwt.verify(token, process.env.SECRET_KEY);
 

@@ -31,11 +31,18 @@ function Login() {
       if (res.status === 400) {
         toast.error(res.data.error);
       } else if (res.status === 200) {
+        // Save user name in localStorage
+        localStorage.setItem("userName", res.data.name);
+
+        // Dispatch login
         dispatch(setAuth(true));
+
+        // Redirect to homepage
         history.push("/");
       }
     } catch (error) {
       console.log(error);
+      toast.error("Something went wrong. Please try again.");
     }
   };
 
@@ -80,15 +87,12 @@ function Login() {
         </div>
 
         <div className="login_right">
-          
-
           <div className="login__content">
             <h1>Login</h1>
             <h4>Secure your passwords, for free.</h4>
             <p>
               New here? <Link to="/signup">Signup</Link>
             </p>
-           
           </div>
         </div>
       </div>

@@ -32,9 +32,11 @@ function Login() {
         toast.error(res.data.error);
       } else if (res.status === 200) {
         // Save user name in localStorage
-        localStorage.setItem("userName", res.data.name);
+        if (res.data && res.data.name) {
+          localStorage.setItem("userName", res.data.name);  // Save name in localStorage
+        }
 
-        // Dispatch login
+        // Dispatch login state
         dispatch(setAuth(true));
 
         // Redirect to homepage

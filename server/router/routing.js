@@ -66,34 +66,32 @@ router.post("/login", async (req, res) => {
         const isMatch = await bcrypt.compare(password, emailExist.password);
 
         if (isMatch) {
-            // Generate auth token
             const token = await emailExist.generateAuthToken();
 
-            // Set the JWT in the cookie
+            // Set JWT in cookies
             res.cookie("jwtoken", token, {
                 expires: new Date(Date.now() + 2592000000),
                 httpOnly: true
             });
 
-            // Return user name and token in the response
+            // Include name in response data
             return res.status(200).json({
                 message: "User logged in successfully.",
                 data: {
-                    name: emailExist.name, // Include the user's name here
+                    name: emailExist.name,  // Send name here
                     token: token
                 }
             });
         } else {
             return res.status(400).json({ error: "Invalid Credentials" });
         }
-
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: "Server error" });
     }
-});
+})
 
-router.get("/authenticate", authenticate, async (req, res) =>
+router.get("/authenticate",  async (req, res) =>
 {
     res.send(req.rootUser);
 })

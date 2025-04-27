@@ -91,7 +91,7 @@ router.post("/login", async (req, res) => {
     }
 })
 
-router.get("/authenticate",  async (req, res) =>
+router.get("/authenticate", authenticate, async (req, res) =>
 {
     res.send(req.rootUser);
 })

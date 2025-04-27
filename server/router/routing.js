@@ -71,7 +71,8 @@ router.post("/login", async (req, res) => {
             // Set JWT in cookies
             res.cookie("jwtoken", token, {
                 expires: new Date(Date.now() + 2592000000),
-                httpOnly: true
+                httpOnly: true,
+                 secure: process.env.NODE_ENV === "production"
             });
 
             // Include name in response data

@@ -3,7 +3,7 @@ const User = require("../models/schema");
 
 const authenticate = async (req, res, next) => {
     try {
-        const token = req.cookies.jwtoken;
+        const token = req.header('Authorization')?.split(' ')[1];
 
         // if (!token) {
         //     return res.status(401).json({ error: "No token provided" });

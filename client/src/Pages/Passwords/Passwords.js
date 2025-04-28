@@ -7,32 +7,27 @@ import { Modal } from "react-responsive-modal";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { saveNewPassword, checkAuthenticated } from "../../axios/instance";
-import { useSelector, useDispatch } from "react-redux";
-import { setAuth, setPasswords } from "../../redux/actions";
 
 function Passwords() {
   const [platform, setPlatform] = useState("");
   const [platEmail, setPlatEmail] = useState("");
   const [platPass, setPlatPass] = useState("");
-
   const [open, setOpen] = useState(false);
-
+  const [name, setName] = useState("");  // State to hold the user's name
+  const [passwords, setPasswords] = useState([]);
+  
   const history = useHistory();
-
-  const { isAuthenticated, name, email, passwords } = useSelector(
-    (state) => state
-  );
-  const dispatch = useDispatch();
 
   const verifyUser = async () => {
     try {
       const res = await checkAuthenticated();
 
       if (res.status === 400) {
-        dispatch(setAuth(false));
+        history.replace("/signin");
       } else {
-        const { passwords } = res.data;
-        dispatch(setPasswords(passwords));
+        const { name, passwords } = res.data;
+        setName(name); // Set the name in local state
+        setPasswords(passwords); // Set the passwords
       }
     } catch (error) {
       console.log(error);
@@ -45,7 +40,6 @@ function Passwords() {
         platform: platform,
         userPass: platPass,
         platEmail: platEmail,
-        userEmail: email,
       };
 
       const res = await saveNewPassword(data);
@@ -83,14 +77,14 @@ function Passwords() {
   };
 
   useEffect(() => {
-    !isAuthenticated && history.replace("/signin");
-  }, [isAuthenticated, history]);
+    verifyUser();
+  }, []);
 
   return (
     <div className="passwords">
       <ToastContainer />
       <h1>
-        Welcome <span className="name"> {name} </span>{" "}
+        Welcome <span className="name">{name || "User"}</span>
       </h1>
 
       <div className="modal">
@@ -134,7 +128,9 @@ function Passwords() {
               />
             </div>
 
-            <button onClick={addNewPassword}> Add </button>
+            <button type="button" onClick={addNewPassword}>
+              Add
+            </button>
           </form>
         </Modal>
       </div>
@@ -157,10 +153,9 @@ function Passwords() {
           })
         ) : (
           <div className="nopass">
-            <p> You have not added any passwords yet. </p>
+            <p>You have not added any passwords yet.</p>
             <button className="modalButton" onClick={() => setOpen(true)}>
-              {" "}
-              Try Adding a password now{" "}
+              Try Adding a password now
             </button>
           </div>
         )}

@@ -35,7 +35,7 @@ function Logout()
         }
         logout();
 
-    }, )
+    },[history,dispatch] )
     return (
         <div className="logout">
             Logging you out...

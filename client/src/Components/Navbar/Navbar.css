@@ -9,32 +9,20 @@
   top: 0;
   background-color: #041d3b;
   z-index: 5;
-  
 }
 
 .navbar .navbar__left h2 a {
- 
   text-decoration: none;
   color: #edecf0;
 }
 
-.navbar .navbar__left h2 a:hover{
+.navbar .navbar__left h2 a:hover {
   color: #20b4d8;
   text-decoration: underline;
 }
-.navbar .navbar__right{
-  width:28%;
-}
 
-.navbar .navbar__right .rignavbar__rightht__menu {
-  cursor: pointer;
-  position: relative;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  width: 2rem;
-  height: 2rem;
-  transition: all 0.5s ease;
+.navbar .navbar__right {
+  width: 28%;
 }
 
 .navbar .navbar__right .right__menu ul {
@@ -49,7 +37,6 @@
   font-size: 1rem;
   padding: 0 0.5rem;
   color: #ffffff;
-  
 }
 
 .navbar .navbar__right .right__menu ul li a:hover {
@@ -57,7 +44,6 @@
   cursor: pointer;
   font-weight: 790;
   text-decoration: underline;
-
 }
 
 .menu__icon {
@@ -81,17 +67,6 @@
   z-index: 100;
 }
 
-.back {
-  padding: 2rem 10vw;
-}
-
-.back__button {
-  color: #fff;
-  cursor: pointer;
-  width: 1.5rem !important;
-  height: 1.5rem !important;
-}
-
 .phone__nav ul {
   margin-top: 2rem;
   list-style-type: none;
@@ -112,11 +87,24 @@
 }
 
 @media only screen and (max-width: 800px) {
+  .navbar {
+    padding: 0 2vw; /* Adjust padding for smaller screens */
+    justify-content: space-between; /* Align items to the ends */
+  }
+
+  .navbar .navbar__left, .navbar .navbar__right {
+    width: auto;
+  }
+
   .right__menu {
     display: none;
   }
 
   .menu__icon {
     display: block;
+  }
+
+  .phone__nav ul li a {
+    padding: 1.5rem;
   }
 }

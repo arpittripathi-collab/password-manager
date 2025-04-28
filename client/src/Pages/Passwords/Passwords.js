@@ -84,7 +84,7 @@ function Passwords() {
     <div className="passwords">
       <ToastContainer />
       <h1>
-        Welcome // <span className="name">{name || "User"}</span>
+        Welcome
     </h1>
     
     

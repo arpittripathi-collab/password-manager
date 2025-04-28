@@ -43,50 +43,53 @@ function Passwords() {
     }
   };
 
-  const addNewPassword = async (e) => {
-    e.preventDefault(); // Prevents the form from refreshing the page on submit
+ const addNewPassword = async (e) => {
+  e.preventDefault();
 
-    try {
-      const data = {
-        platform: platform,
-        userPass: platPass,
-        platEmail: platEmail,
-        userEmail: email,
-      };
-
-      const res = await saveNewPassword(data);
-
-      if (res.status === 400) {
-        toast.error(res.data.error, {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-      } else if (res.status === 200) {
-        setOpen(false);
-        verifyUser();
-        toast.success(res.data.message, {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-
-        setPlatform("");
-        setPlatEmail("");
-        setPlatPass("");
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  const data = {
+    platform: platform,
+    userPass: platPass,
+    platEmail: platEmail,
+    userEmail: email,
   };
+
+  console.log("Sending Data:", data);  // Log the data being sent
+
+  try {
+    const res = await saveNewPassword(data);
+
+    if (res.status === 400) {
+      toast.error(res.data.error, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    } else if (res.status === 200) {
+      setOpen(false);
+      verifyUser();
+      toast.success(res.data.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+
+      setPlatform("");
+      setPlatEmail("");
+      setPlatPass("");
+    }
+  } catch (error) {
+    console.log("Error:", error);  // Log the full error
+  }
+};
+
 
   useEffect(() => {
     if (!isAuthenticated) {

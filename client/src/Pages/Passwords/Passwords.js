@@ -27,73 +27,78 @@ function Passwords() {
   const verifyUser = async () => {
     try {
       const res = await checkAuthenticated();
+      console.log("Authentication Check:", res.status); // Log the status
 
       if (res.status === 400) {
         dispatch(setAuth(false));
+        localStorage.removeItem('isAuthenticated'); // Remove if not authenticated
       } else {
         const { passwords } = res.data;
         dispatch(setPasswords(passwords));
+        dispatch(setAuth(true)); // Ensure authentication state is updated
+        localStorage.setItem('isAuthenticated', true); // Persist authentication state
+      }
+    } catch (error) {
+      console.log("Error verifying user:", error);
+    }
+  };
+
+  const addNewPassword = async (e) => {
+    e.preventDefault(); // Prevents the form from refreshing the page on submit
+
+    try {
+      const data = {
+        platform: platform,
+        userPass: platPass,
+        platEmail: platEmail,
+        userEmail: email,
+      };
+
+      const res = await saveNewPassword(data);
+
+      if (res.status === 400) {
+        toast.error(res.data.error, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      } else if (res.status === 200) {
+        setOpen(false);
+        verifyUser();
+        toast.success(res.data.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+
+        setPlatform("");
+        setPlatEmail("");
+        setPlatPass("");
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-const addNewPassword = async (e) => {
-  e.preventDefault();  // Prevents the form from refreshing the page on submit
-
-  try {
-    const data = {
-      platform: platform,
-      userPass: platPass,
-      platEmail: platEmail,
-      userEmail: email,
-    };
-
-    const res = await saveNewPassword(data);
-
-    if (res.status === 400) {
-      toast.error(res.data.error, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    } else if (res.status === 200) {
-      setOpen(false);
-      verifyUser();
-      toast.success(res.data.message, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-
-      setPlatform("");
-      setPlatEmail("");
-      setPlatPass("");
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-
   useEffect(() => {
-    !isAuthenticated && history.replace("/signin");
+    if (!isAuthenticated) {
+      history.replace("/signin");
+    }
   }, [isAuthenticated, history]);
 
   return (
     <div className="passwords">
       <ToastContainer />
       <h1>
-        Welcome <span className="name"> {name} </span>{" "}
+        Welcome <span className="name"> {name} </span>
       </h1>
 
       <div className="modal">
@@ -137,8 +142,7 @@ const addNewPassword = async (e) => {
               />
             </div>
 
-           <button type="button" onClick={(e) => addNewPassword(e)}> Add </button>
-
+            <button type="button" onClick={(e) => addNewPassword(e)}> Add </button>
           </form>
         </Modal>
       </div>
@@ -163,8 +167,7 @@ const addNewPassword = async (e) => {
           <div className="nopass">
             <p> You have not added any passwords yet. </p>
             <button className="modalButton" onClick={() => setOpen(true)}>
-              {" "}
-              Try Adding a password now{" "}
+              Try Adding a password now
             </button>
           </div>
         )}

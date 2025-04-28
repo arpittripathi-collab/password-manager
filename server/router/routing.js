@@ -49,47 +49,49 @@ router.post("/register", async (req, res) =>
     res.json({ error: "There was an internal error. Sorry for the inconvience." })
 })
 
-router.post("/login", async (req, res) => {
+router.post("/login", async (req, res) =>
+{
     const { email, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({ error: "Please fill the data." });
+    if (!email || !password)
+    {
+        return res.status(400).json({ error: "Please fill the data." })
     }
 
-    try {
+
+    try
+    {
         const emailExist = await User.findOne({ email: email });
 
-        if (!emailExist) {
-            return res.status(400).json({ error: "Invalid Credentials." });
+        if (!emailExist)
+        {
+            return res.status(400).json({ error: "Invalid Credentials." })
         }
 
         const isMatch = await bcrypt.compare(password, emailExist.password);
 
-        if (isMatch) {
-            const token = await emailExist.generateAuthToken();
-
-            // Set JWT in cookies
+        const token = await emailExist.generateAuthToken();
+        if (isMatch)
+        {
             res.cookie("jwtoken", token, {
                 expires: new Date(Date.now() + 2592000000),
-                httpOnly: true,
-                 secure: process.env.NODE_ENV === "production"
+                httpOnly: true
             });
 
-            // Include name in response data
-            return res.status(200).json({
-                message: "User logged in successfully.",
-                data: {
-                    name: emailExist.name,  // Send name here
-                    token: token
-                }
-            });
-        } else {
+            return res.status(200).json({ message: "User login successfully." })
+        }
+
+        else
+        {
             return res.status(400).json({ error: "Invalid Credentials" });
         }
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ error: "Server error" });
+
     }
+    catch (error)
+    {
+        console.log(error)
+    }
+
 })
 
 router.get("/authenticate", authenticate, async (req, res) =>
@@ -160,7 +162,7 @@ router.post("/deletepassword", authenticate, async (req, res) =>
     }
 })
 
-router.get("/logout", (req, res) =>
+router.post("/logout", (req, res) =>
 {
     res.clearCookie("jwtoken", { path: "/" });
     res.status(200).send("Logout");

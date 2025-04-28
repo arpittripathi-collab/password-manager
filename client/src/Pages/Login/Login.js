@@ -31,11 +31,7 @@ function Login() {
       if (res.status === 400) {
         toast.error(res.data.error);
       } else if (res.status === 200) {
-        // Save user name in localStorage
-        if (res.data && res.data.name) {
-          localStorage.setItem("userName", res.data.name);  // Save name in localStorage
-        }
-
+        
         // Dispatch login state
         dispatch(setAuth(true));
 

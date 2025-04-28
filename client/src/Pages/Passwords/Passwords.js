@@ -40,6 +40,7 @@ function Passwords() {
   };
 
   const addNewPassword = async () => {
+     e.preventDefault();
     try {
       const data = {
         platform: platform,

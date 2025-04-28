@@ -84,8 +84,11 @@ function Passwords() {
     <div className="passwords">
       <ToastContainer />
       <h1>
-        Welcome <span className="name">{name || "User"}</span>
-      </h1>
+        Welcome // <span className="name">{name || "User"}</span>
+    </h1>
+    
+    
+      
 
       <div className="modal">
         <button className="modalButton" onClick={() => setOpen(true)}>

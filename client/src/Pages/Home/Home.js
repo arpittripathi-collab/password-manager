@@ -32,7 +32,7 @@ function Home() {
                 ) : (
                     <>
                         <h1>
-                            Welcome, <span className="name">{name}</span>
+                            Welcome
                         </h1>
                         <p>
                             Hope you're doing well! Ready to manage your saved passwords?

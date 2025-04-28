@@ -137,7 +137,8 @@ const addNewPassword = async (e) => {
               />
             </div>
 
-            <button onClick={addNewPassword}> Add </button>
+           <button type="button" onClick={(e) => addNewPassword(e)}> Add </button>
+
           </form>
         </Modal>
       </div>

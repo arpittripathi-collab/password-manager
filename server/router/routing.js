@@ -100,40 +100,34 @@ router.get("/authenticate", authenticate, async (req, res) =>
     res.send(req.rootUser);
 })
 
-router.get("/addnewpassword", authenticate, async (req, res) =>
-{
+router.post("/addnewpassword", authenticate, async (req, res) => {
     const { platform, userPass, userEmail, platEmail } = req.body;
 
-    if (!platform || !userPass || !userEmail || !platEmail)
-    {
+    if (!platform || !userPass || !userEmail || !platEmail) {
         return res.status(400).json({ error: "Please fill the form properly" });
     }
 
-    try
-    {
+    try {
         const rootUser = req.rootUser;
 
+        if (!rootUser) {
+            return res.status(401).json({ error: "Authentication failed." });
+        }
 
         const { iv, encryptedPassword } = encrypt(userPass);
 
         const isSaved = await rootUser.addNewPassword(encryptedPassword, iv, platform, platEmail);
 
-        if (isSaved)
-        {
-            return res.status(200).json({ message: "Successfully added your password." })
+        if (isSaved) {
+            return res.status(200).json({ message: "Successfully added your password." });
+        } else {
+            return res.status(400).json({ error: "Could not save the password." });
         }
-        else
-        {
-            return res.status(400).json({ error: "Could not save the password." })
-        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Server error occurred." }); // Use 500 for server errors
     }
-    catch (error)
-    {
-        console.log(error)
-    }
-
-    return res.status(400).json({ error: "An unknown error occured." })
-})
+});
 
 router.post("/deletepassword", authenticate, async (req, res) =>
 {

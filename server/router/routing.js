@@ -124,7 +124,7 @@ router.post("/addnewpassword", authenticate, async (req, res) => {
             return res.status(400).json({ error: "Could not save the password." });
         }
     } catch (error) {
-        console.error(error);
+       
         return res.status(500).json({ error: "Server error occurred." }); // Use 500 for server errors
     }
 });

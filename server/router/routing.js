@@ -100,7 +100,7 @@ router.get("/authenticate", authenticate, async (req, res) =>
     res.send(req.rootUser);
 })
 
-router.post("/addnewpassword", authenticate, async (req, res) =>
+router.get("/addnewpassword", authenticate, async (req, res) =>
 {
     const { platform, userPass, userEmail, platEmail } = req.body;
 

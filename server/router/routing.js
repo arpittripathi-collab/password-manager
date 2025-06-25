@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const authenticate = require("../middlewares/authenticate");
 const { encrypt, decrypt } = require("../models/EncDecManager");
 
-router.post("/register", async (req, res) =>
+router.get("/register", async (req, res) =>
 {
     const { name, email, password, cpassword } = req.body;
 
